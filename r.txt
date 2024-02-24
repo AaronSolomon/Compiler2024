@@ -1,4 +1,4 @@
-a /* alpha */ a
+a /* alpha */ a /* * comments */
 b
 /* c
  * d
