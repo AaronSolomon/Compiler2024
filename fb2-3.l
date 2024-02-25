@@ -16,7 +16,6 @@
   int newfile(char *fn);
   int popfile(void);
   int mylineno;
-  int level = 0;
 %}
 %%
     //   match #include statement up through the quote or < 
@@ -38,10 +37,8 @@
 
 <<EOF>>                    { if(!popfile()) yyterminate(); }
 
-^.                         { for (int i=1; i<level; ++i) fprintf(yyout, "  ");
-                             fprintf(yyout, "%4d %s", mylineno, yytext); }
-^\n                        { for (int i=1; i<level; ++i) fprintf(yyout, "  ");
-                             fprintf(yyout, "%4d %s", mylineno++, yytext); }
+^.                         { fprintf(yyout, "%4d %s", mylineno, yytext); }
+^\n                        { fprintf(yyout, "%4d %s", mylineno++, yytext); }
 \n                         { ECHO; mylineno++; }
 .                          { ECHO; }
 
@@ -76,7 +73,6 @@ int newfile(char *fn) { // Prepared to read from a file
   yy_switch_to_buffer(bs->bs);
   bs->filename = strdup(fn);
   curbs = bs;
-  ++level;
   mylineno = 1;
   curfilename = bs->filename;
   return 1;
@@ -101,7 +97,6 @@ int popfile(void) {
 
   yy_switch_to_buffer(prevbs->bs);
   curbs = prevbs;
-  --level;
   mylineno = curbs->lineno;
   curfilename = curbs->filename;
   return 1; 
