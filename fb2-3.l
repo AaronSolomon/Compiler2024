@@ -53,13 +53,11 @@ int main(int argc, char **argv)
     fprintf(stderr, "need filename\n");
     return 1;
   }
-  if(newfile(argv[1]))
-    yylex();
+  if(newfile(argv[1]))  // push the filename into the stack
+    yylex();            // start scanning
 }
 
-int
-  newfile(char *fn)
-{
+int newfile(char *fn) { // Prepared to read from a file
   FILE *f = fopen(fn, "r");
   struct bufstack *bs = malloc(sizeof(struct bufstack));
 
@@ -68,14 +66,15 @@ int
   if(!bs) { perror("malloc"); exit(1); }
 
   /* remember state */
-  if(curbs)curbs->lineno = mylineno;
-  bs->prev = curbs;
+  if (curbs)
+      curbs->lineno = mylineno;
 
   /* set up current entry */
-  bs->bs = yy_create_buffer(f, YY_BUF_SIZE);
+  bs->prev = curbs;
   bs->f = f;
-  bs->filename = strdup(fn);
+  bs->bs = yy_create_buffer(f, YY_BUF_SIZE);
   yy_switch_to_buffer(bs->bs);
+  bs->filename = strdup(fn);
   curbs = bs;
   ++level;
   mylineno = 1;
@@ -83,9 +82,7 @@ int
   return 1;
 }
 
-int
-  popfile(void)
-{
+int popfile(void) {
   struct bufstack *bs = curbs;
   struct bufstack *prevbs;
 
