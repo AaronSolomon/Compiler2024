@@ -1,4 +1,0 @@
-Apple
-Banana
-Coconut
-Orange

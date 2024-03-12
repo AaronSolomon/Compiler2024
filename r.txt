@@ -1,7 +1,0 @@
-a /* alpha */ a /* * comments */
-b
-/* c
- * d
- * e
- */ f
-g
