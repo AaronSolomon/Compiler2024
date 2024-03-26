@@ -1,18 +1,38 @@
 
-float4.exe: float4.l float4.y
-	bison -d float4.y
-	flex -ofloat4.lex.c float4.l
-	gcc -o float4.exe float4.tab.c float4.lex.c
+float7.exe: float7.l float7.y
+	bison -d float7.y
+	flex -ofloat7.lex.c float7.l
+	gcc -o float7.exe float7.tab.c float7.lex.c
+
+float6.exe: float2.l float6.y
+	bison --header=float2.tab.h float6.y
+	flex -ofloat2.lex.c float2.l
+	gcc -o float6.exe float6.tab.c float2.lex.c
+
+float5.exe: float2.l float5.y
+	bison --header=float2.tab.h float5.y
+	flex -ofloat2.lex.c float2.l
+	gcc -o float5.exe float5.tab.c float2.lex.c
+
+float4.exe: float2.l float4.y
+	bison --header=float2.tab.h float4.y
+	flex -ofloat2.lex.c float2.l
+	gcc -o float4.exe float4.tab.c float2.lex.c
+
+float3.exe: float2.l float3.y
+	bison --header=float2.tab.h float3.y
+	flex -ofloat2.lex.c float2.l
+	gcc -o float3.exe float3.tab.c float2.lex.c
+
+float2.exe: float2.l float2.y
+	bison -d float2.y
+	flex -ofloat2.lex.c float2.l
+	gcc -o float2.exe float2.tab.c float2.lex.c
 
 float1.exe: float1.l float1.y
 	bison -d float1.y
 	flex -ofloat1.lex.c float1.l
 	gcc -o float1.exe float1.tab.c float1.lex.c
-
-float.exe: float.l float.y
-	bison -d float.y
-	flex -ofloat.lex.c float.l
-	gcc -o float.exe float.tab.c float.lex.c
 
 rational5.exe: rational5.l rational4.y
 	bison --header=rational5.tab.h -orational5.tab.c rational4.y
