@@ -14,7 +14,7 @@ void yyerror(char* s, ...) {
 }
 %}
 %%
-[0-9]+  { yylval = atof(yytext); return NUMBER; }
+[0-9]+  { yylval = atoi(yytext); return NUMBER; }
 "+"     { return PLUS; }
 "-"     { return MINUS; }
 [ \t]   { }
