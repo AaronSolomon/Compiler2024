@@ -1,13 +1,48 @@
 
+float4.exe: float4.l float4.y
+	bison -d float4.y
+	flex -ofloat4.lex.c float4.l
+	gcc -o float4.exe float4.tab.c float4.lex.c
+
+float1.exe: float1.l float1.y
+	bison -d float1.y
+	flex -ofloat1.lex.c float1.l
+	gcc -o float1.exe float1.tab.c float1.lex.c
+
 float.exe: float.l float.y
 	bison -d float.y
 	flex -ofloat.lex.c float.l
 	gcc -o float.exe float.tab.c float.lex.c
 
+rational5.exe: rational5.l rational4.y
+	bison --header=rational5.tab.h -orational5.tab.c rational4.y
+	flex -orational5.lex.c rational5.l
+	gcc -o rational5.exe rational5.tab.c rational5.lex.c
+
+rational4.exe: rational2.l rational4.y
+	bison --header=rational2.tab.h rational4.y
+	flex -orational2.lex.c rational2.l
+	gcc -o rational4.exe rational4.tab.c rational2.lex.c
+
+rational3.exe: rational2.l rational3.y
+	bison --header=rational2.tab.h rational3.y
+	flex -orational2.lex.c rational2.l
+	gcc -o rational3.exe rational3.tab.c rational2.lex.c
+
+rational2.exe: rational2.l rational2.y
+	bison -d rational2.y
+	flex -orational2.lex.c rational2.l
+	gcc -o rational2.exe rational2.tab.c rational2.lex.c
+
 rational.exe: rational.l rational.y
 	bison -d rational.y
 	flex -orational.lex.c rational.l
 	gcc -o rational.exe rational.tab.c rational.lex.c
+
+arithmetic4.exe: arithmetic4.l arithmetic4.y
+	bison -d arithmetic4.y
+	flex -oarithmetic4.lex.c arithmetic4.l
+	gcc -o arithmetic4.exe arithmetic4.tab.c arithmetic4.lex.c
 
 arithmetic3.exe: arithmetic3.l arithmetic3.y
 	bison -d arithmetic3.y
