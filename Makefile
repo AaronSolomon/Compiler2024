@@ -34,6 +34,11 @@ float1.exe: float1.l float1.y
 	flex -ofloat1.lex.c float1.l
 	gcc -o float1.exe float1.tab.c float1.lex.c
 
+rational6.exe: rational6.l rational4.y
+	bison --header=rational6.tab.h -orational6.tab.c rational4.y
+	flex -orational6.lex.c rational6.l
+	gcc -o rational6.exe rational6.tab.c rational6.lex.c
+
 rational5.exe: rational5.l rational4.y
 	bison --header=rational5.tab.h -orational5.tab.c rational4.y
 	flex -orational5.lex.c rational5.l
