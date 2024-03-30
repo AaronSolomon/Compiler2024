@@ -1,4 +1,24 @@
 
+readline4.exe: readline1.l readline4.y
+	bison --header=readline1.tab.h readline4.y
+	flex -oreadline1.lex.c readline1.l
+	gcc -o readline4.exe readline4.tab.c readline1.lex.c -lreadline
+
+readline3.exe: readline1.l readline3.y
+	bison --header=readline1.tab.h readline3.y
+	flex -oreadline1.lex.c readline1.l
+	gcc -o readline3.exe readline3.tab.c readline1.lex.c
+
+readline2.exe: readline1.l readline2.y
+	bison --header=readline1.tab.h readline2.y
+	flex -oreadline1.lex.c readline1.l
+	gcc -o readline2.exe readline2.tab.c readline1.lex.c
+
+readline1.exe: readline1.l readline1.y
+	bison -d readline1.y
+	flex -oreadline1.lex.c readline1.l
+	gcc -o readline1.exe readline1.tab.c readline1.lex.c
+
 float7.exe: float7.l float7.y
 	bison -d float7.y
 	flex -ofloat7.lex.c float7.l
