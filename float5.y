@@ -90,7 +90,7 @@ factor: INT       { $$.valueType = T_INT; $$.n = yylval.n; }
                     }
     | factor DIV INT { if ($1.valueType == T_INT) {
                          $$.valueType = T_FLOAT;
-                         $$.f = (float) $1.n / $3.n;
+                         $$.f = (float) $1.n / (float) $3.n;
                       } else {
                          $$.valueType = T_FLOAT;
                          $$.f = $1.f / (float) $3.n;

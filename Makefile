@@ -24,10 +24,10 @@ float7.exe: float7.l float7.y
 	flex -ofloat7.lex.c float7.l
 	gcc -o float7.exe float7.tab.c float7.lex.c
 
-float6.exe: float2.l float6.y
-	bison --header=float2.tab.h float6.y
-	flex -ofloat2.lex.c float2.l
-	gcc -o float6.exe float6.tab.c float2.lex.c
+float6.exe: float6.l float6.y
+	bison -d float6.y
+	flex -ofloat6.lex.c float6.l
+	gcc -o float6.exe float6.tab.c float6.lex.c
 
 float5.exe: float2.l float5.y
 	bison --header=float2.tab.h float5.y

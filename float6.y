@@ -27,7 +27,7 @@ expr: factor    { if ($1.valueType == 1) {
                      $$.u.n = $1.u.n;
                   } else {
                      $$.valueType = 2;
-                     $$.u.n = $1.u.f;
+                     $$.u.f = $1.u.f;
                   }
                 }
     | expr PLUS factor { if ($1.valueType == 1) {
@@ -57,7 +57,7 @@ expr: expr MINUS factor { if ($1.valueType == 1) {
                                $$.valueType = 2;
                                $$.u.f = (float) $1.u.n - $3.u.f;
                             }
-                         } else {
+                         } else { // $1.valueType == T_FLOAT
                             if ($3.valueType == 1) {
                                $$.valueType = 2;
                                $$.u.f = $1.u.f - (float) $3.u.n;
@@ -69,7 +69,7 @@ expr: expr MINUS factor { if ($1.valueType == 1) {
                     }
 
 factor: INT       { $$.valueType = 1; $$.u.n = yylval.u.n; }
-    | FLOAT     { $$.valueType = 2; $$.u.f = yylval.u.f; }
+    | FLOAT       { $$.valueType = 2; $$.u.f = yylval.u.f; }
     | factor MUL INT { if ($1.valueType == 1) {
                          $$.valueType = 1;
                          $$.u.n = $1.u.n * $3.u.n;

@@ -2,11 +2,13 @@
 %{
 #include <stdio.h>
 #include <stdarg.h>
-#include "float2.tab.h"
+#include "float6.tab.h"
 struct MyValue {        // This must be defined in both .l and .y
     int valueType;      // 1: int; 2: float
-    int n;
-    float f;
+    union myUnion {
+      int n;
+      float f;
+    } u;
 };
 
 void yyerror(char* s, ...) {
@@ -20,9 +22,9 @@ void yyerror(char* s, ...) {
 %}
 %%
 
-([0-9]+)?\.[0-9]+  { yylval.valueType = 2; yylval.f = atof(yytext); return FLOAT; }
-[0-9]+\.  { yylval.valueType = 2; yylval.f = atof(yytext); return FLOAT; }
-[0-9]+    { yylval.valueType = 1; yylval.n = atoi(yytext); return INT; }
+([0-9]+)?\.[0-9]+  { yylval.valueType = 2; yylval.u.f = atof(yytext); return FLOAT; }
+[0-9]+\.  { yylval.valueType = 2; yylval.u.f = atof(yytext); return FLOAT; }
+[0-9]+    { yylval.valueType = 1; yylval.u.n = atoi(yytext); return INT; }
 
 "+" { return PLUS; }
 "-" { return MINUS; }

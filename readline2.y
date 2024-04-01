@@ -2,6 +2,7 @@
 %token WORD
 %{
 #include <stdio.h>
+#include <unistd.h>
 extern FILE *yyset_in(FILE *);
 extern int yylex(void);
 extern char* yytext;
@@ -21,5 +22,6 @@ int main(int argc, char** argv) {
     fp = fopen("a.txt", "r");
     yyset_in(fp);
     yyparse();
+    unlink("a.txt");    // Delete the file
     return 0;
 }
