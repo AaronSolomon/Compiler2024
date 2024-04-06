@@ -1,4 +1,9 @@
 
+func1.exe:  func1.l func1.y func1.h func1.c
+	bison -d func1.y
+	flex -ofunc1.lex.c func1.l
+	gcc -o $@ func1.tab.c func1.lex.c func1.c -lm
+
 assign3.exe: assign3.l assign3.y
 	bison -d assign3.y
 	flex -o assign3.lex.c assign3.l
