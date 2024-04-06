@@ -1,4 +1,29 @@
 
+assign3.exe: assign3.l assign3.y
+	bison -d assign3.y
+	flex -o assign3.lex.c assign3.l
+	gcc -o assign3.exe assign3.lex.c assign3.tab.c assign3funcs.c
+
+fb3-2.exe:  fb3-2.l fb3-2.y fb3-2.h fb3-2funcs.c
+	bison -d fb3-2.y
+	flex -ofb3-2.lex.c fb3-2.l
+	gcc -o $@ fb3-2.tab.c fb3-2.lex.c fb3-2funcs.c -lm
+
+assign2u.exe: assign2.l assign2u.y
+	bison --header=assign2.tab.h assign2u.y
+	flex -o assign2.lex.c assign2.l
+	gcc -o assign2u.exe assign2.lex.c assign2u.tab.c
+
+assign2r.exe: assign2.l assign2r.y
+	bison --header=assign2.tab.h assign2r.y
+	flex -o assign2.lex.c assign2.l
+	gcc -o assign2r.exe assign2.lex.c assign2r.tab.c
+
+assign2.exe: assign2.l assign2.y
+	bison -d assign2.y
+	flex -o assign2.lex.c assign2.l
+	gcc -o assign2.exe assign2.lex.c assign2.tab.c
+
 readline4.exe: readline1.l readline4.y
 	bison --header=readline1.tab.h readline4.y
 	flex -oreadline1.lex.c readline1.l
