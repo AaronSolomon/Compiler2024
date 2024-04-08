@@ -3,7 +3,6 @@
 %%
 stmt : expr
      | PRINT expr
-     | stmt ';' expr
 
 expr : assignment               /* conflict: VAR '=' expr '+' NUMBER */
      | NUMBER                   /*           ^----------^            */

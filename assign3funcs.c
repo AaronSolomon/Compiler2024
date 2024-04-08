@@ -9,10 +9,10 @@
  */
 #  include <stdio.h>
 #  include <stdlib.h>
-#  include <stdarg.h>
 #  include <string.h>
-#  include <math.h>
-#  include "fb3-2.h"
+#  include "assign3.h"
+void yyerror(const char *s);
+int yyparse();
 
 /* symbol table */
 
