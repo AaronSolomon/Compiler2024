@@ -1,18 +1,18 @@
-/* User-Defined Function
- * It uses the dummy parameter names, rather than the memory address of
- * parameters.  I don't know whether we can call this method "pass by value".
- * Disadvantage: This approach disallows recursive function call.
+/* Companion source code for "flex & bison", published by O'Reilly
+ * Media, ISBN 978-0-596-15597-1
+ * Copyright (c) 2009, Taughannock Networks. All rights reserved.
+ * See the README file for license conditions and contact info.
+ * $Header: /home/johnl/flnb/code/RCS/fb3-2funcs.c,v 2.1 2009/11/08 02:53:18 johnl Exp $
  */
-
 /*
- * helper functions for func1
+ * helper functions for fb3-2
  */
 #  include <stdio.h>
 #  include <stdlib.h>
 #  include <stdarg.h>
 #  include <string.h>
 #  include <math.h>
-#  include "func1.h"
+#  include "fb3-2.h"
 
 /* symbol table */
 
@@ -58,7 +58,7 @@ struct ast* newast(int nodetype, struct ast *l, struct ast *r) {
     yyerror("out of space");
     exit(0);
   }
-  a->nodetype = nodetype;       /* '+','-','*','/' */
+  a->nodetype = nodetype;
   a->l = l;
   a->r = r;
   return a;
@@ -73,9 +73,34 @@ struct ast* newnum(double d) {
   }
   a->nodetype = 'K';
   a->number = d;
-  return (struct ast*)a;
+  return (struct ast *)a;
 }
 
+struct ast* newcmp(int cmptype, struct ast *l, struct ast *r) {
+  struct ast *a = malloc(sizeof(struct ast));
+  
+  if(!a) {
+    yyerror("out of space");
+    exit(0);
+  }
+  a->nodetype = '0' + cmptype;
+  a->l = l;
+  a->r = r;
+  return a;
+}
+
+struct ast* newfunc(int functype, struct ast *l) { /* built-in functions */
+  struct fncall *a = malloc(sizeof(struct fncall));
+  
+  if(!a) {
+    yyerror("out of space");
+    exit(0);
+  }
+  a->nodetype = 'F';
+  a->l = l;
+  a->functype = functype;
+  return (struct ast *)a;
+}
 
 struct ast* newcall(struct symbol *s, struct ast *l) {
   struct ufncall *a = malloc(sizeof(struct ufncall));
@@ -112,7 +137,21 @@ struct ast* newasgn(struct symbol *s, struct ast *v) {
   a->nodetype = '=';
   a->s = s;
   a->v = v;
-  return (struct ast*)a;
+  return (struct ast *)a;
+}
+
+struct ast* newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast *el) {
+  struct flow *a = malloc(sizeof(struct flow));
+  
+  if(!a) {
+    yyerror("out of space");
+    exit(0);
+  }
+  a->nodetype = nodetype;
+  a->cond = cond;
+  a->tl = tl;
+  a->el = el;
+  return (struct ast *)a;
 }
 
 struct symlist* newsymlist(struct symbol *sym, struct symlist *next) {
@@ -139,12 +178,13 @@ void symlistfree(struct symlist *sl) {
 
 /* define a function */
 void dodef(struct symbol *name, struct symlist *syms, struct ast *func) {
-  if(name->syms) symlistfree(name->syms); // parameter list
-  if(name->func) treefree(name->func);    // How to do calculation
+  if(name->syms) symlistfree(name->syms);
+  if(name->func) treefree(name->func);
   name->syms = syms;
   name->func = func;
 }
 
+static double callbuiltin(struct fncall *);
 static double calluser(struct ufncall *);
 
 double eval(struct ast *a) {
@@ -174,13 +214,68 @@ double eval(struct ast *a) {
   case '|': v = fabs(eval(a->l)); break;
   case 'M': v = -eval(a->l); break;
 
-  case 'L': eval(a->l); v = eval(a->r); break; // explist
+    /* comparisons */
+  case '1': v = (eval(a->l) > eval(a->r))? 1 : 0; break;
+  case '2': v = (eval(a->l) < eval(a->r))? 1 : 0; break;
+  case '3': v = (eval(a->l) != eval(a->r))? 1 : 0; break;
+  case '4': v = (eval(a->l) == eval(a->r))? 1 : 0; break;
+  case '5': v = (eval(a->l) >= eval(a->r))? 1 : 0; break;
+  case '6': v = (eval(a->l) <= eval(a->r))? 1 : 0; break;
+
+  /* control flow */
+  /* null if/else/do expressions allowed in the grammar, so check for them */
+  case 'I': 
+    if( eval( ((struct flow *)a)->cond) != 0) {
+      if( ((struct flow *)a)->tl) {
+	v = eval( ((struct flow *)a)->tl);
+      } else
+	v = 0.0;		/* a default value */
+    } else {
+      if( ((struct flow *)a)->el) {
+        v = eval(((struct flow *)a)->el);
+      } else
+	v = 0.0;		/* a default value */
+    }
+    break;
+
+  case 'W':
+    v = 0.0;		/* a default value */
+    
+    if( ((struct flow *)a)->tl) {
+      while( eval(((struct flow *)a)->cond) != 0)
+	v = eval(((struct flow *)a)->tl);
+    }
+    break;			/* last value is value */
+	              
+  case 'L': eval(a->l); v = eval(a->r); break;
+
+  case 'F': v = callbuiltin((struct fncall *)a); break;
 
   case 'C': v = calluser((struct ufncall *)a); break;
 
   default: printf("internal error: bad node %c\n", a->nodetype);
   }
   return v;
+}
+
+static double callbuiltin(struct fncall *f) {
+  enum bifs functype = f->functype;
+  double v = eval(f->l);
+
+ switch(functype) {
+ case B_sqrt:
+   return sqrt(v);
+ case B_exp:
+   return exp(v);
+ case B_log:
+   return log(v);
+ case B_print:
+   printf("= %4.4g\n", v);
+   return v;
+ default:
+   yyerror("Unknown built-in function %d", functype);
+   return 0.0;
+ }
 }
 
 static double calluser(struct ufncall *f) {
@@ -209,7 +304,7 @@ static double calluser(struct ufncall *f) {
     yyerror("Out of space in %s", fn->name); return 0.0;
   }
   
-  /* 1. evaluate the arguments */
+  /* evaluate the arguments */
   for(i = 0; i < nargs; i++) {
     if(!args) {
       yyerror("too few args in call to %s", fn->name);
@@ -226,8 +321,7 @@ static double calluser(struct ufncall *f) {
     }
   }
 		     
-  /* 2. save old values of original parameters, 
-   * 3. assign new ones */
+  /* save old values of dummies, assign new ones */
   sl = fn->syms;
   for(i = 0; i < nargs; i++) {
     struct symbol *s = sl->sym;
@@ -239,10 +333,10 @@ static double calluser(struct ufncall *f) {
 
   free(newval);
 
-  /* 4. evaluate the function by AST */
+  /* evaluate the function */
   v = eval(fn->func);
 
-  /* 5. put the dummies back (Restore from oldval[] */
+  /* put the dummies back */
   sl = fn->syms;
   for(i = 0; i < nargs; i++) {
     struct symbol *s = sl->sym;
@@ -279,6 +373,12 @@ void treefree(struct ast* a) {
 
   case '=':
     free( ((struct symasgn *)a)->v);
+    break;
+
+  case 'I': case 'W':
+    free( ((struct flow *)a)->cond);
+    if( ((struct flow *)a)->tl) free( ((struct flow *)a)->tl);
+    if( ((struct flow *)a)->el) free( ((struct flow *)a)->el);
     break;
 
   default: printf("internal error: free bad node %c\n", a->nodetype);
@@ -336,6 +436,20 @@ void dumpast(struct ast *a, int level) {
 
   case '|': case 'M': 
     printf("unop %c\n", a->nodetype);
+    dumpast(a->l, level);
+    return;
+
+  case 'I': case 'W':
+    printf("flow %c\n", a->nodetype);
+    dumpast( ((struct flow *)a)->cond, level);
+    if( ((struct flow *)a)->tl)
+      dumpast( ((struct flow *)a)->tl, level);
+    if( ((struct flow *)a)->el)
+      dumpast( ((struct flow *)a)->el, level);
+    return;
+	              
+  case 'F':
+    printf("builtin %d\n", ((struct fncall *)a)->functype);
     dumpast(a->l, level);
     return;
 
